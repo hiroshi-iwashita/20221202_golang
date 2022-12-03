@@ -1,4 +1,5 @@
 {
+    "go.toolsEnvVars": {"GO111MODULE": "on"},
     "go.formatTool": "gofmt",
     "go.lintOnSave": "workspace",
     "go.lintTool": "golangci-lint",
