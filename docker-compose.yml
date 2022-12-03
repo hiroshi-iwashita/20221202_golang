@@ -1,22 +1,17 @@
 version: "3.9"
 services:
   db:
+    container_name: db
     build:
       context: ./build/db
       dockerfile: Dockerfile
       target: dev
-    container_name: db
     volumes:
       - db:/var/lib/mysql
     tty: true
     restart: always
     env_file:
       - .env
-    # environment:
-    #   - MYSQL_DATABASE=test_db
-    #   - MYSQL_USER=root
-    #   - MYSQL_PASSWORD=password
-    #   - MYSQL_ROOT_PASSWORD=password
     ports:
       - "3306:3306"
     networks:
