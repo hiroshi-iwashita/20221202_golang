@@ -7,11 +7,12 @@ import (
 	"os"
 	"time"
 
+	"github.com/go-sql-driver/mysql"
 	_ "github.com/go-sql-driver/mysql"
 )
 
 func open(path string, count uint) *sql.DB {
-	db, err := sql.Open("mysql", path)
+	db, err := sql.Open(os.Getenv("DB_DRIVER"), path)
 	if err != nil {
 		log.Fatal("open error:", err)
 	}
@@ -28,13 +29,21 @@ func open(path string, count uint) *sql.DB {
 }
 
 func connectDB() *sql.DB {
-	var path string = fmt.Sprintf(
-		"%s:%s@tcp(db:3306)/%s?charset=utf8&parseTime=true",
-		os.Getenv("MYSQL_USER"),
-		os.Getenv("MYSQL_ROOT_PASSWORD"),
-		os.Getenv("MYSQL_DATABASE"),
-	)
-	return open(path, 100)
+	jst, err := time.LoadLocation("Asia/Tokyo")
+	if err != nil {
+		// handle error
+	}
+	c := mysql.Config{
+		DBName:    os.Getenv("MYSQL_DATABASE"),
+		User:      os.Getenv("MYSQL_USER"),
+		Passwd:    os.Getenv("MYSQL_ROOT_PASSWORD"),
+		Addr:      "db:3306",
+		Net:       "tcp",
+		ParseTime: true,
+		Collation: "utf8mb4_unicode_ci",
+		Loc:       jst,
+	}
+	return open(c.FormatDSN(), 100)
 }
 
 func main() {
