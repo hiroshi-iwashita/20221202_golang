@@ -1,0 +1,53 @@
+version: "3.9"
+services:
+  db:
+    build:
+      context: ./build/db
+      dockerfile: Dockerfile
+      target: dev
+    container_name: db
+    volumes:
+      - db:/var/lib/mysql
+    tty: true
+    restart: always
+    env_file:
+      - .env
+    # environment:
+    #   - MYSQL_DATABASE=test_db
+    #   - MYSQL_USER=root
+    #   - MYSQL_PASSWORD=password
+    #   - MYSQL_ROOT_PASSWORD=password
+    ports:
+      - "3306:3306"
+    networks:
+      - golang_test_network
+
+  api:
+    container_name: api
+    build:
+      context: ./build/api
+      dockerfile: Dockerfile
+      target: dev
+    tty: true
+    stdin_open: true
+    restart: always
+    volumes:
+      - .:/go/src/app
+    env_file:
+      - .env
+    environment:
+      - API_PORT
+    ports:
+      - ${API_PORT}:${API_PORT}
+    depends_on:
+      - db
+    networks:
+      - golang_test_network
+
+volumes:
+  db:
+    name: db-volume
+
+networks:
+  golang_test_network:
+    external: true
