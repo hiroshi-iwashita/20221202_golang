@@ -7,13 +7,43 @@ services:
       dockerfile: Dockerfile
       target: dev
     volumes:
-      - db:/var/lib/mysql
+      - type: volume
+        source: db
+        target: /var/lib/mysql
+      - type: bind
+        source: ./build/db/init
+        target: /docker-entrypoint-initdb.d
     tty: true
     restart: always
     env_file:
       - .env
+    environment:
+      - DB_PORT
     ports:
-      - "3306:3306"
+      - ${DB_PORT}:${DB_PORT}
+    networks:
+      - golang_test_network
+
+  phpmyadmin:
+    container_name: phpmyadmin
+    image: phpmyadmin/phpmyadmin
+    env_file:
+      - .env
+    environment:
+      - PMA_ARBITRARY=1
+      - PMA_HOSTS=db
+      - PMA_USER=${MYSQL_USER}
+      - PMA_PASSWORD=${MYSQL_ROOT_PASSWORD}
+    links:
+      - db
+    ports:
+      - ${PHPMYADMIN_PORT}:80
+    volumes:
+      - type: volume
+        source: sessions
+        target: /sessions
+        volume:
+          nocopy: true
     networks:
       - golang_test_network
 
@@ -42,6 +72,8 @@ services:
 volumes:
   db:
     name: db-volume
+  sessions:
+    name: phpmyadmin-volume
 
 networks:
   golang_test_network:
