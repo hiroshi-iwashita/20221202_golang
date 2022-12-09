@@ -6,21 +6,25 @@ services:
       context: ./build/db
       dockerfile: Dockerfile
       target: dev
-    volumes:
-      - type: volume
-        source: db
-        target: /var/lib/mysql
-      - type: bind
-        source: ./build/db/init
-        target: /docker-entrypoint-initdb.d
+    # platform: linux/x86_64 // add this for Apple Silicon
     tty: true
     restart: always
     env_file:
       - .env
     environment:
-      - DB_PORT
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+      - MYSQL_ROOT_PASSWORD=root_password
     ports:
       - ${DB_PORT}:${DB_PORT}
+    volumes:
+      - ./build/db/init:/docker-entrypoint-initdb.d
+      - db:/var/lib/mysql
+      # - type: volume
+      #   source: db
+      #   target: /var/lib/mysql
+      # - type: bind
+      #   source: ./build/db/init
+      #   target: /docker-entrypoint-initdb.d
     networks:
       - golang_test_network
 
@@ -31,19 +35,19 @@ services:
       - .env
     environment:
       - PMA_ARBITRARY=1
-      - PMA_HOSTS=db
+      - PMA_HOSTS=${MYSQL_HOST}
       - PMA_USER=${MYSQL_USER}
       - PMA_PASSWORD=${MYSQL_ROOT_PASSWORD}
     links:
       - db
     ports:
       - ${PHPMYADMIN_PORT}:80
-    volumes:
-      - type: volume
-        source: sessions
-        target: /sessions
-        volume:
-          nocopy: true
+    # volumes:
+    #   - type: volume
+    #     source: sessions
+    #     target: /sessions
+    #     volume:
+    #       nocopy: true
     networks:
       - golang_test_network
 
@@ -61,19 +65,19 @@ services:
     env_file:
       - .env
     environment:
-      - API_PORT
+      - MYSQL_HOST=${MYSQL_HOST}
     ports:
       - ${API_PORT}:${API_PORT}
     depends_on:
-      - db
+      - ${MYSQL_HOST}
     networks:
       - golang_test_network
 
-volumes:
-  db:
-    name: db-volume
-  sessions:
-    name: phpmyadmin-volume
+# volumes:
+#   db:
+#     name: db-volume
+  # sessions:
+  #   name: phpmyadmin-volume
 
 networks:
   golang_test_network:
