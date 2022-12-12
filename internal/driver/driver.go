@@ -3,6 +3,7 @@ package driver
 import (
 	"database/sql"
 	"fmt"
+	"log"
 	"os"
 	"time"
 
@@ -20,7 +21,7 @@ const maxOpenDbConn = 5 // might be changed in production
 const maxIdleDbConn = 5 // might be changed in production
 const maxDbLifeTime = 5 * time.Minute
 
-func ConnectDB() (*DB, error) {
+func ConnectDB(count int) (*DB, error) {
 	setDns()
 
 	d, err := open(dbConn.dns)
@@ -32,7 +33,7 @@ func ConnectDB() (*DB, error) {
 	d.SetMaxIdleConns(maxIdleDbConn)
 	d.SetConnMaxLifetime(maxDbLifeTime)
 
-	err = testDB(d)
+	err = testDB(d, count)
 	if err != nil {
 		return nil, err
 	}
@@ -45,7 +46,7 @@ func ConnectDB() (*DB, error) {
 func setDns() {
 	jst, err := time.LoadLocation("Asia/Tokyo")
 	if err != nil {
-		// handle error
+		log.Fatal("Load location failed:", err)
 	}
 	address := os.Getenv("MYSQL_HOST") + ":" + os.Getenv("DB_PORT")
 	c := mysql.Config{
@@ -64,18 +65,71 @@ func setDns() {
 
 // NewDatabase creates a new database for the application
 func open(dsn string) (*sql.DB, error) {
-	db, err := sql.Open("mysql", dsn)
+	db, err := sql.Open(os.Getenv("DB_DRIVER"), dsn)
 	if err != nil {
 		return nil, err
 	}
 	return db, nil
 }
 
-func testDB(d *sql.DB) error {
+func testDB(d *sql.DB, count int) error {
 	err := d.Ping()
 	if err != nil {
-		fmt.Println("Error!", err)
-		return err
+		if count <= 0 {
+			fmt.Println("Error!", err)
+			return err
+		}
+		time.Sleep(time.Second * 2)
+		count--
+		fmt.Printf("Retry Connection... count:%v\n", count)
+		return testDB(d, count)
 	}
 	return nil
 }
+
+// RoundTrip を DB接続リトライで実装するほうがbetter
+
+// type retryableRoundTripper struct {
+// 	base     http.RoundTripper
+// 	attempts int
+// 	waitTime time.Duration
+// }
+
+// func (rt *retryableRoundTripper) shouldRetry(resp *http.Response, err error) bool {
+// 	if err != nil {
+// 		var netErr net.Error
+// 		if errors.As(err, &netErr) && netErr.Temporary() {
+// 			return true
+// 		}
+// 	}
+
+// 	if resp != nil {
+// 		if resp.StatusCode == 429 ||
+// 			(500 <= resp.StatusCode && resp.StatusCode <= 504) {
+// 			return true
+// 		}
+// 	}
+
+// 	return false
+// }
+
+// func (rt *retryableRoundTripper) RoundTrip(req *http.Request) (*http.Response, error) {
+// 	var (
+// 		resp *http.Response
+// 		err  error
+// 	)
+// 	for count := 0; count < rt.attempts; count++ {
+// 		resp, err = rt.base.RoundTrip(req)
+
+// 		if !rt.shouldRetry(resp, err) {
+// 			return resp, err
+// 		}
+
+// 		select {
+// 		case <-req.Context().Done():
+// 			return nil, req.Context().Err()
+// 		case <-time.After(rt.waitTime):
+// 		}
+// 	}
+// 	return resp, nil
+// }

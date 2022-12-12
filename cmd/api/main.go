@@ -25,6 +25,7 @@ type applicationConfig struct {
 }
 
 var port int
+var dbConnectRetryTimes int
 var infoLog *log.Logger
 var errorLog *log.Logger
 var environment string
@@ -37,6 +38,11 @@ func init() {
 	eap := os.Getenv("API_PORT")
 	p, _ := strconv.Atoi(eap)
 	port = p
+
+	// set DB connect retry times
+	dbcrt := os.Getenv("DBCONNECTRETRY")
+	dc, _ := strconv.Atoi(dbcrt)
+	dbConnectRetryTimes = dc
 
 	// setup infoLog
 	infoLog = log.New(os.Stdout, "INFO\t", log.Ldate|log.Ltime)
@@ -75,7 +81,7 @@ func main() {
 
 // runDB connects to database
 func runDB() (*sql.DB, error) {
-	db, err := driver.ConnectDB()
+	db, err := driver.ConnectDB(dbConnectRetryTimes)
 	if err != nil {
 		log.Fatal("Cannot connect to database")
 	}
