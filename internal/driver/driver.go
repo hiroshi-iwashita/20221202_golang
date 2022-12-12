@@ -51,7 +51,7 @@ func setDns() {
 	c := mysql.Config{
 		DBName:    os.Getenv("MYSQL_DATABASE"),
 		User:      os.Getenv("MYSQL_USER"),
-		Passwd:    os.Getenv("MYSQL_ROOT_PASSWORD"),
+		Passwd:    os.Getenv("MYSQL_PASSWORD"),
 		Addr:      address,
 		Net:       "tcp",
 		ParseTime: true,

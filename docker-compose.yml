@@ -11,20 +11,13 @@ services:
     restart: always
     env_file:
       - .env
-    environment:
-      - MYSQL_DATABASE=${MYSQL_DATABASE}
-      - MYSQL_ROOT_PASSWORD=root_password
     ports:
       - ${DB_PORT}:${DB_PORT}
     volumes:
       - ./build/db/init:/docker-entrypoint-initdb.d
-      - db:/var/lib/mysql
-      # - type: volume
-      #   source: db
-      #   target: /var/lib/mysql
-      # - type: bind
-      #   source: ./build/db/init
-      #   target: /docker-entrypoint-initdb.d
+      - type: volume
+        source: db
+        target: /var/lib/mysql
     networks:
       - golang_test_network
 
@@ -37,7 +30,7 @@ services:
       - PMA_ARBITRARY=1
       - PMA_HOSTS=${MYSQL_HOST}
       - PMA_USER=${MYSQL_USER}
-      - PMA_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - PMA_PASSWORD=${MYSQL_PASSWORD}
     links:
       - db
     ports:
@@ -64,8 +57,6 @@ services:
       - .:/go/src/app
     env_file:
       - .env
-    environment:
-      - MYSQL_HOST=${MYSQL_HOST}
     ports:
       - ${API_PORT}:${API_PORT}
     depends_on:
@@ -73,9 +64,9 @@ services:
     networks:
       - golang_test_network
 
-# volumes:
-#   db:
-#     name: db-volume
+volumes:
+  db:
+    name: db-volume
   # sessions:
   #   name: phpmyadmin-volume
 

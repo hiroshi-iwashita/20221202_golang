@@ -1,0 +1,33 @@
+INSERT INTO `users`
+    (
+        user_id,
+        first_name,
+        last_name,
+        email,
+        email_verified_at,
+        created_at,
+        updated_at,
+        deleted_at
+    )
+VALUES
+    (
+        'user_id_001',
+        'Hiroshi',
+        'Iwashita',
+        '001@test.com',
+        CURRENT_TIMESTAMP,
+        CURRENT_TIMESTAMP,
+        CURRENT_TIMESTAMP,
+        NULL
+    ),
+    (
+        'user_id_002',
+        'Hiromi',
+        'Koyama',
+        '002@test.com',
+        NULL,
+        CURRENT_TIMESTAMP,
+        CURRENT_TIMESTAMP,
+        NULL
+    )
+;
