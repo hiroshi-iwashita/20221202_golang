@@ -3,7 +3,10 @@ package models
 import (
 	"context"
 	"database/sql"
+	"log"
 	"time"
+
+	"github.com/go-sql-driver/mysql"
 )
 
 const dbTimeout = time.Second * 3
@@ -31,19 +34,28 @@ type Models struct {
 	// Token Token
 }
 
+// define type for NULL from database
+type NullTime struct {
+	mysql.NullTime
+}
+
+type NullString struct {
+	sql.NullString
+}
+
 // User is the structure which holds one user from the database. Note
 // that it embeds a token type.
 type User struct {
-	ID              int       `json:"id"`
-	UserID          string    `json:"user_id" validate:"required"`
-	FirstName       string    `json:"first_name"`
-	LastName        string    `json:"last_name"`
-	Email           string    `json:"email" validate:"required"`
-	EmailVerifiedAt time.Time `json:"email_verified_at"`
+	ID              int        `json:"id"`
+	UserID          string     `json:"user_id" validate:"required"`
+	FirstName       NullString `json:"first_name"`
+	LastName        NullString `json:"last_name"`
+	Email           string     `json:"email" validate:"required"`
+	EmailVerifiedAt NullTime   `json:"email_verified_at"`
 	// TokenID   Token     `json:"token_id"`
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
-	DeletedAt time.Time `json:"deleted_at"`
+	DeletedAt NullTime  `json:"deleted_at"`
 }
 
 // Token is the data structure for any token in the database. Note that
@@ -97,6 +109,10 @@ func (u *User) GetAll() ([]*User, error) {
 		}
 
 		users = append(users, &user)
+	}
+	err = rows.Err()
+	if err != nil {
+		log.Fatal(err)
 	}
 
 	return users, nil
