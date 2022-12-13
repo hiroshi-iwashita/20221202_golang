@@ -1,17 +1,17 @@
 package driver
 
 import (
-	"database/sql"
 	"fmt"
 	"log"
 	"os"
 	"time"
 
 	"github.com/go-sql-driver/mysql"
+	"github.com/jmoiron/sqlx"
 )
 
 type DB struct {
-	SQL *sql.DB
+	SQL *sqlx.DB
 	dns string
 }
 
@@ -64,15 +64,15 @@ func setDns() {
 }
 
 // NewDatabase creates a new database for the application
-func open(dsn string) (*sql.DB, error) {
-	db, err := sql.Open(os.Getenv("DB_DRIVER"), dsn)
+func open(dsn string) (*sqlx.DB, error) {
+	db, err := sqlx.Open(os.Getenv("DB_DRIVER"), dsn)
 	if err != nil {
 		return nil, err
 	}
 	return db, nil
 }
 
-func testDB(d *sql.DB, count int) error {
+func testDB(d *sqlx.DB, count int) error {
 	err := d.Ping()
 	if err != nil {
 		if count <= 0 {
@@ -85,6 +85,17 @@ func testDB(d *sql.DB, count int) error {
 		return testDB(d, count)
 	}
 	return nil
+
+	// use Ping.Context but not works
+	// ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
+	// defer cancel()
+
+	// if err := d.PingContext(ctx); err != nil {
+	// 	log.Fatal(err)
+	// 	return err
+	// }
+
+	// return nil
 }
 
 // RoundTrip を DB接続リトライで実装するほうがbetter
