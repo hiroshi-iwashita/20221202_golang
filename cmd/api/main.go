@@ -1,7 +1,6 @@
 package main
 
 import (
-	"database/sql"
 	"fmt"
 	"log"
 	"net/http"
@@ -10,6 +9,7 @@ import (
 
 	"github.com/hiroshi-iwashita/20221202_golang/internal/driver"
 	"github.com/hiroshi-iwashita/20221202_golang/internal/models"
+	"github.com/jmoiron/sqlx"
 )
 
 // // application is the type for all data we want to share with the
@@ -40,7 +40,7 @@ func init() {
 	port = p
 
 	// set DB connect retry times
-	dbcrt := os.Getenv("DBCONNECTRETRY")
+	dbcrt := os.Getenv("DB_CONNECT_RETRY")
 	dc, _ := strconv.Atoi(dbcrt)
 	dbConnectRetryTimes = dc
 
@@ -80,7 +80,7 @@ func main() {
 }
 
 // runDB connects to database
-func runDB() (*sql.DB, error) {
+func runDB() (*sqlx.DB, error) {
 	db, err := driver.ConnectDB(dbConnectRetryTimes)
 	if err != nil {
 		log.Fatal("Cannot connect to database")
