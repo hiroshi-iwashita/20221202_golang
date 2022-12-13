@@ -74,7 +74,7 @@ func (app *applicationConfig) errorJSON(w http.ResponseWriter, err error, status
 
 	switch {
 	case strings.Contains(err.Error(), "SQLSTATE 23505"):
-		customErr = errors.New("duplicate valie violates unique constraint")
+		customErr = errors.New("duplicate value violates unique constraint")
 		statusCode = http.StatusForbidden
 	case strings.Contains(err.Error(), "SQLSTATE 22001"):
 		customErr = errors.New("the value you are trying to insert is too large")
