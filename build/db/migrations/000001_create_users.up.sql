@@ -9,8 +9,10 @@ CREATE TABLE IF NOT EXISTS `users`
         `created_at` DATETIME(3) NOT NULL,
         `updated_at` DATETIME(3) NOT NULL,
         `deleted_at` DATETIME(3) NULL,
-        UNIQUE INDEX `users_email_key`(`email`),
-        PRIMARY KEY (`id`)
+        PRIMARY KEY (`id`, `user_id`),
+        CONSTRAINT `UK_users` 
+            UNIQUE (`email`),
+        INDEX `IDX_users_user_id` (`user_id`)
     ) 
     DEFAULT CHARACTER SET `utf8mb4`
     COLLATE `utf8mb4_unicode_ci`

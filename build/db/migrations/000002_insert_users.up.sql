@@ -14,7 +14,7 @@ VALUES
         'user_id_001',
         'Hiroshi',
         'Iwashita',
-        '001@test.com',
+        '101@test.com',
         CURRENT_TIMESTAMP,
         CURRENT_TIMESTAMP,
         CURRENT_TIMESTAMP,
@@ -24,10 +24,20 @@ VALUES
         'user_id_002',
         'Hiromi',
         'Koyama',
-        '002@test.com',
+        '302@test.com',
         NULL,
         CURRENT_TIMESTAMP,
         CURRENT_TIMESTAMP,
         NULL
+    ),
+    (
+        'user_id_003',
+        'Shohei',
+        'Ohtani',
+        '203@test.com',
+        CURRENT_TIMESTAMP,
+        CURRENT_TIMESTAMP,
+        CURRENT_TIMESTAMP,
+        CURRENT_TIMESTAMP
     )
 ;

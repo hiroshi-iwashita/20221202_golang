@@ -16,20 +16,33 @@ CREATE TABLE `users`
         `created_at` DATETIME(3) NOT NULL,
         `updated_at` DATETIME(3) NOT NULL,
         `deleted_at` DATETIME(3) NULL,
-        UNIQUE INDEX `users_email_key`(`email`),
-        PRIMARY KEY (`id`)
+        PRIMARY KEY (`id`, `user_id`),
+        CONSTRAINT `UK_users` 
+            UNIQUE (`email`),
+        INDEX `IDX_users_user_id` (`user_id`)
     ) 
     DEFAULT CHARACTER SET `utf8mb4`
     COLLATE `utf8mb4_unicode_ci`
 ;
 
--- DROP TABLE IF EXISTS `tokens`;
--- CREATE TABLE `tokens` (
---     `id` int(11) NOT NULL AUTO_INCREMENT,
---     `user_id` VARCHAR(36) NOT NULL,
---     `created_at` DATETIME(3) NULL,
---     `updated_at` DATETIME(3) NULL,
---     `expire_at` DATETIME(3) NULL,
---     UNIQUE INDEX `user_id`(`user_id`),
---     PRIMARY KEY (`id`)
--- ) DEFAULT CHARACTER SET `utf8mb4` COLLATE `utf8mb4_unicode_ci`;
+DROP TABLE IF EXISTS `tokens`;
+CREATE TABLE `tokens`
+    (
+        `id` int(11) NOT NULL AUTO_INCREMENT,
+        `user_id` VARCHAR(36) NOT NULL,
+        `token` VARCHAR(191) NOT NULL,
+        `created_at` DATETIME(3) NOT NULL,
+        `updated_at` DATETIME(3) NOT NULL,
+        `expire_at` DATETIME(3) NOT NULL,
+        PRIMARY KEY (`id`),
+        CONSTRAINT `UK_tokens` 
+            UNIQUE (`user_id`, `token`),
+        CONSTRAINT `FK_tokens_user_id` 
+            FOREIGN KEY (`user_id`) 
+            REFERENCES `users` (`user_id`)
+            ON UPDATE CASCADE
+            ON DELETE CASCADE
+    )
+    DEFAULT CHARACTER SET `utf8mb4`
+    COLLATE `utf8mb4_unicode_ci`
+;
