@@ -9,4 +9,8 @@ require (
 	github.com/justinas/nosurf v1.1.1
 )
 
-require github.com/jmoiron/sqlx v1.3.5
+require (
+	github.com/google/uuid v1.3.0
+	github.com/jmoiron/sqlx v1.3.5
+	golang.org/x/crypto v0.4.0
+)
