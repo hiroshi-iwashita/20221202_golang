@@ -3,6 +3,7 @@ CREATE TABLE IF NOT EXISTS `tokens`
         `id` int(11) NOT NULL AUTO_INCREMENT,
         `user_id` VARCHAR(36) NOT NULL,
         `token` VARCHAR(191) NOT NULL,
+        `token_hash` BLOB NOT NULL,
         `created_at` DATETIME(3) NOT NULL,
         `updated_at` DATETIME(3) NOT NULL,
         `expire_at` DATETIME(3) NOT NULL,

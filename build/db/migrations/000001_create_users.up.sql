@@ -5,6 +5,7 @@ CREATE TABLE IF NOT EXISTS `users`
         `first_name` VARCHAR(191) NULL,
         `last_name` VARCHAR(191) NULL,
         `email` VARCHAR(191) NOT NULL,
+        `password` VARCHAR(191) NOT NULL,
         `email_verified_at` DATETIME(3) NULL,
         `created_at` DATETIME(3) NOT NULL,
         `updated_at` DATETIME(3) NOT NULL,
