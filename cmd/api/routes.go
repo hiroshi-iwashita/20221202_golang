@@ -7,6 +7,7 @@ import (
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
 	"github.com/go-chi/cors"
+	"github.com/hiroshi-iwashita/20221202_golang/internal/models"
 )
 
 // routes generates our routes and attaches them to handlers, using the chi router
@@ -44,14 +45,37 @@ func (app *applicationConfig) routes() http.Handler {
 	mux.Get("/", func(w http.ResponseWriter, _ *http.Request) {
 		io.WriteString(w, "Hello world")
 	})
-	mux.Get("/about", func(w http.ResponseWriter, _ *http.Request) {
-		io.WriteString(w, "about page")
+
+	mux.Route("/auth", func(mux chi.Router) {
+		// mux.Get("/login", app.Login)
+		mux.Post("/login", app.Login)
 	})
-	mux.Get("/contact", func(w http.ResponseWriter, _ *http.Request) {
-		io.WriteString(w, "contact page")
-	})
+
 	mux.Get("/user", app.User)
-	mux.Get("/users", app.AllUsers)
+	mux.Get("/users/all", app.AllUsers)
+	mux.Get("/users/get/{id}", app.getUserByID)
+	mux.Get("/users/add", func(w http.ResponseWriter, r *http.Request) {
+		var u = models.User{
+			FirstName: "You",
+			LastName:  "There",
+			Email:     "edsoif@dfj.com",
+			Password:  "password",
+		}
+
+		app.infoLog.Println("Adding user...")
+
+		userID, err := app.models.User.Insert(u)
+		if err != nil {
+			app.errorLog.Println(err)
+			app.errorJSON(w, err, http.StatusForbidden)
+			return
+		}
+
+		app.infoLog.Println("Got back user_id of", userID)
+		newUser, _ := app.models.User.ShowByID(userID)
+		app.writeJSON(w, http.StatusOK, newUser)
+	})
+	mux.Post("/users/delete/{user_id}", app.DeleteUserByID)
 
 	return mux
 }
