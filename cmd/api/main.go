@@ -60,8 +60,6 @@ func init() {
 }
 
 func main() {
-	// fmt.Println("main.main")
-
 	dbPool, _ := runDB()
 
 	app := &applicationConfig{
